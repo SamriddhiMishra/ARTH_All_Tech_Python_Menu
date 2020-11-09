@@ -59,7 +59,7 @@ while True:
     elif choice == 8:
         aws()
     elif choice == 9:
-        configuredocker()
+        docker()
 		
     color(2)    
     input("Press Enter to continue...")    
