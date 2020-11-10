@@ -25,7 +25,8 @@ print("\t\t\t Welcome to our Python Automation Menu")
 print("\t\t\t -------------------------------------------")
 color(6)
 while True:
-    os.system("clear")    
+    os.system("clear")   
+    os.system("echo WELCOME $(whoami)") 
     choice = input('''Choose one of the options :- 
         1) Press 1 for Hadoop Configuration :
         2) Press 2 for Data Upload and Read from cluster FileSystem :

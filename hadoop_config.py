@@ -1,58 +1,144 @@
 import os
+import subprocess as sp
 
-def color(n):
-	os.system("tput setaf {}".format(n))
+def prRed(skk): print("\033[91m {}\033[00m" .format(skk)) 
+def prGreen(skk): print("\033[92m {}\033[00m" .format(skk)) 
+def prYellow(skk): print("\033[93m {}\033[00m" .format(skk)) 
+def prLightPurple(skk): print("\033[94m {}\033[00m" .format(skk)) 
+def prPurple(skk): print("\033[95m {}\033[00m" .format(skk)) 
+def prCyan(skk): print("\033[96m {}\033[00m" .format(skk)) 
+def prLightGray(skk): print("\033[97m {}\033[00m" .format(skk)) 
+def prBlack(skk): print("\033[98m {}\033[00m" .format(skk))
+
+
+
+def hdfs(cmd):
+	os.system(cmd+"cd /etc/hadoop ; rm hdfs-site.xml")
+	os.system("touch hdfs-site.xml")
+	f=open("hdfs-site.xml","w")
+	f.write("""<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<!-- Put site-specific property overrides in this file. -->
+<configuration>
+<property>
+<name>dfs.name.dir</name>
+<value>/hadoop</value>
+</property>
+</configuration>""")
+	f.close()
+	os.system(cmd+"echo 3 > /proc/sys/vm/drop_caches")
+def core(cmd,ip):
+	os.system(cmd+"cd / ; rm -r hadoopnode -force")
+	os.system(cmd+"mkdir /hadoopnode")
+	prCyan("Folder Created with Name hadoop")
+	os.system(cmd+"yum install wget -y")
+	x=sp.getstatusoutput(cmd+"hadoop version")
+	print(x)
+	os.system(cmd+"wget http://35.244.242.82/yum/java/el7/x86_64/jdk-8u171-linux-x64.rpm")
+	os.system(cmd+"wget https://archive.apache.org/dist/hadoop/core/hadoop-1.2.1/hadoop-1.2.1-1.x86_64.rpm")
+	os.system(cmd+"rpm -ivh jdk-8u171-linux-x64.rpm")
+	os.system(cmd+"rpm -ivh hadoop-1.2.1-1.x86_64.rpm --force")
+	os.system(cmd+"cd /etc/hadoop ; rm core-site.xml")
+	os.system("touch core-site.xml")
+	f=open("core-site.xml","w")
+	f.write("""<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<!-- Put site-specific property overrides in this file. -->
+<configuration>
+<property>
+<name>fs.default.name</name>
+<value>hdfs://{0}:9001</value>
+</property>
+</configuration>""".format(ip))
+	f.close()
+	os.system(cmd+"cp core-site.xml /etc/hadoop/core-site.xml")
 def hadoop_config():
-        color(6)
-        os.system("rpm -ivh jdk-8u171-linux-x64.rpm")
-        os.system("rpm -ivh hadoop-1.2.1-1.x86_64.rpm --force")
-        os.system("echo 3 > /proc/sys/vm/drop_caches ")
-        os.system("rm -rf /n")
-        os.system("mkdir /n")
-        os.system("cd /etc/hadoop")
-        color(2)
-        print("\n############### Installation Done ###########\n")
-        color(6)
-        choice =  input("How you want system to configure as masternode/datanode (M/D) :- ")
-
-        if choice == "M":
-            ip = "0.0.0.0"
-            node="name"
-            
-        else:
-            ip = input("Please input IP addresss of Master node :-")
-            node="data"
-
-
-        core ='''<?xml version='1.0'?>\n<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>\n<!-- Put site-specific property overrides in this file. -->\n<configuration>\n<property>\n<name>fs.default.name</name>\n<value>hdfs://{}:9001</value>\n</property>\n</configuration>'''
-
-        hdfs = '''<?xml version='1.0'?>\n<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>\n<!-- Put site-specific property overrides in this file. -->\n<configuration>\n<property>\n<name>dfs.{}.dir</name>\n<value>/n</value>\n</property>\n</configuration>'''
-
-
-        hdfs = hdfs.format(node)
-        core = core.format(ip)
-
-
-        os.system("rm -rf /etc/hadoop/hdfs-site.xml")
-        os.system("rm -rf /etc/hadoop/core-site.xml")
-
-
-        os.system('echo "{}" > /etc/hadoop/hdfs-site.xml'.format(hdfs))
-        os.system('echo "{}" > /etc/hadoop/core-site.xml'.format(core))
-        color(2)
-        print("\n############### Configuration Done #############\n")
-        color(6)
-        if node == 'name':
-            os.system('hadoop namenode -format')
-            color(2)
-            print("\n############ Formatting of NameNode Done #############\n")
-            color(6)
-        os.system('hadoop-daemon.sh start {}node'.format(node))
-        os.system("jps")
-        color(2)
-        print("\n############ {} Service Started ###########\n".format(node.upper()))
-        color(3)
-        input("Press Enter to see filesystem report :-")
-        print("\n########## Filesystem Report ##########\n")
-        os.system("hadoop dfsadmin -report | less")
-
+	while True:
+		os.system("clear")
+		prRed("\n\n    ***** This is an automation script to configure nodes of HADOOP *****\n\n")
+		prGreen("Enter \n 1. to configure this system \n 2. to configure another system(must have ssh access)\n\n          ")
+		option1=int(input(""))
+		if option1 == 1:
+			cmd="sudo "
+			os.system("clear")
+			prYellow("Enter your option \n 1. Name Node \n 2. Data Node\n 3. Client\n")
+			prYellow("Enter your choice")
+			option2=int(input(""))
+			if option2 == 1:
+				os.system("clear")
+				core(cmd,"0.0.0.0")
+				prLightPurple("Done with core-site")
+				hdfs(cmd)
+				prLightPurple("Done with hdfs-site")
+				os.system(cmd+"hadoop namenode -format -force")
+				prLightPurple("*****NAME NODE FORMATTED*****")
+				os.system(cmd+"hadoop-daemon.sh start namenode")
+				os.system("clear")	
+				prGreen(">>>>> NAME NODE STARTED <<<<<")
+			elif option2 == 2:
+				os.system("clear")
+				prYellow("Enter the IP of the master     ")
+				ip=input("")
+				core(cmd,ip)
+				prLightPurple("Done with core-site")
+				hdfs(cmd)
+				prLightPurple("Done with hdfs-site")
+				os.system(cmd+"hadoop-daemon.sh start datanode")
+				os.system("clear")
+				prGreen(">>>> DATA NODE STARTED <<<<<")
+			elif option2==3:
+				os.system("clear")
+				prYellow("Enter the IP of the master")
+				ip=input("")
+				core(cmd,ip)
+				prLightPurple("Done with core-site")
+				os.system(cmd+"hadoop-daemon.sh start client")
+				prGreen(">>>>> CLIENT STARTED <<<<<")
+		elif option1==2:
+			os.system("clear")
+			prYellow("Enter the username:     ")
+			username=input("")
+			prYellow("Enter the IP which you want to configure:     ")
+			ipmain=input("")
+			prYellow("Enter the keypair (eg /home/username/keyname.pem):     ")
+			keyadd=input("")
+			cmd="ssh -l {} {} -i {} sudo ".format(username,ipmain,keyadd)
+			prYellow("Enter your option \n 1. Name Node \n 2. Data Node\n 3. Client\n")
+			option2=int(input(""))
+			if option2 == 1:
+				os.system("clear")
+				core(cmd,"0.0.0.0")
+				os.system("scp -i {0} core-site.xml {1}@{2}:/home/{1}/core-site.xml".format(keyadd,username,ipmain))
+				os.system(cmd+"cp core-site.xml /etc/hadoop/core-site.xml")
+				prLightPurple("Done with core-site")
+				hdfs(cmd)
+				os.system("scp -i {0} hdfs-site.xml {1}@{2}:/home/{1}/hdfs-site.xml".format(keyadd,username,ipmain))
+				os.system(cmd+"cp hdfs-site.xml /etc/hadoop/hdfs-site.xml")
+				prLightPurple("Done with hdfs-site")
+				os.system(cmd+"hadoop namenode -format -force")
+				prLightPurple("*****NAME NODE FORMATTED*****")
+				os.system(cmd+"hadoop-daemon.sh start namenode")
+				prGreen(">>>>> NAME NODE STARTED <<<<<")
+				os.system("jps")
+			elif option2 == 2:
+				os.system("clear")
+				prYellow("Enter the IP of the master     ")
+				ip=input("")
+				core(cmd,ip)
+				os.system("scp -i {0} core-site.xml {1}@{2}:/home/{1}/core-site.xml".format(keyadd,username,ipmain))
+				os.system(cmd+"cp core-site.xml /etc/hadoop/core-site.xml")
+				prLightPurple("Done with core-site")
+				hdfs(cmd)
+				os.system("scp -i {0} hdfs-site.xml {1}@{2}:/home/{1}/hdfs-site.xml".format(keyadd,username,ipmain))
+				os.system(cmd+"cp hdfs-site.xml /etc/hadoop/hdfs-site.xml")
+				prLightPurple("Done with hdfs-site")
+				os.system(cmd+"hadoop-daemon.sh start datanode")
+				prGreen(">>>> DATA NODE STARTED <<<<<")
+			elif option2==3:
+				prYellow("Enter the IP of the master")
+				ip=input("")
+				core(cmd,ip)
+				prLightPurple("Done with core-site")
+				os.system("clear")
+				os.system(cmd+"hadoop-daemon.sh start client")
+				prGreen(">>>>> CLIENT STARTED <<<<<")

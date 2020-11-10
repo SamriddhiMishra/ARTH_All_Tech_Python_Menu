@@ -80,7 +80,7 @@ def docker():
                                         os.system("docker ps")
                                 elif op2=="2":
                                         os.system("clear")
-                                        os.system("docker images -a")
+                                        os.system("sudo docker images -a")
                                 elif op2=="3":
                                         op3=op2
                                         while(op3!="d"):
@@ -88,32 +88,31 @@ def docker():
                                                 prPurple("Enter d for previous Menu\n\n*** OPTION *** \n1. Ubuntu\n2. CentOS\n3. WordPress\n4. MySQL\n5. Django\n6. Mongo")
                                                 op3=input("")
                                                 if op3=="1":
-                                                        os.system("docker pull ubuntu")
+                                                        os.system("sudo docker pull ubuntu")
                                                 elif op3=="2":
-                                                        os.system("docker pull centos")
+                                                        os.system("sudo docker pull centos")
                                                 elif op3=="3":
-                                                        os.system("docker pull wordpress")
+                                                        os.system("sudo docker pull wordpress")
                                                 elif op3=="4":
-                                                        os.system("docker pull mysql")
+                                                        os.system("sudo docker pull mysql")
                                                 elif op3=="5":
-                                                        os.system("docker pull django")
+                                                        os.system("sudo docker pull django")
                                                 elif op3=="6":
-                                                        os.system("docker pull mongo")
+                                                        os.system("sudo docker pull mongo")
                                 elif op2=="4":
                                         os.system("clear")
                                         prPurple("Here is the list of the of OS available")
-                                        os.system("docker images -a")
+                                        os.system("sudo docker images -a")
                                         prYellow("Enter the OS eg centos")
                                         osname=input("")
                                         prYellow("Enter the name of the container")
                                         name=input("")
-                                        os.system("docker run -it --name {} {}".format(name,osname))
+                                        os.system("sudo docker run -it --name {} {}".format(name,osname))
                                         
                                 elif op2=="5":
                                         prYellow("Enter the OS name")
                                         name=input("")
-                                        os.system("docker rm {0}".format(name))
+                                        os.system("sudo docker rm {0}".format(name))
                                 elif op2=="6":
-                                        os.system("docker rm `docker ps -a -q`")
-                #elif op=="1":
+                                        os.system("sudo docker rm `docker ps -a -q`")
 		
